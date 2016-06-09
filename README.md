@@ -1,2 +1,2 @@
-# anemometre
-Test d'anémomètre avec l'arduino
+# Anémone au mètre :D
+Je n'ai pas mis le nom du projet parce que bon, c'est du code affiché en public, et on a pas forcément envie que ce soit facile à trouver, même si pour l'instant le code en lui-même n'a absolument rien de spécial...
