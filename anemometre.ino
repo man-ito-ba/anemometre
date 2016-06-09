@@ -1,4 +1,3 @@
-/*La solution ici consiste à calculer une moyenne mobile sur un nombre d'échantillons précis. Par exemple : les dix derniers échantillons.*/
 const int NbLectures = 10;    //Définit le nombre d'échantillons à conserver pour calculer la moyenne ; plus le chiffre est elevé, plus le tableau sera "lissé", mais plus le programme sera lent. Utiliser  une constante plutôt qu'une variable normale permet d'utiliser cette valeur pour déterminer la taille du tableau.
 
 int Tableau[NbLectures];      // Tableau recevant les signaux analogiques
