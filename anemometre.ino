@@ -1,48 +1,44 @@
-// Define the number of samples to keep track of.  The higher the number,
-// the more the Tableau will be smoothed, but the slower the output will
-// respond to the input.  Using a constant rather than a normal variable lets
-// use this value to determine the size of the Tableau array.
-const int NbLectures = 10;
+const int NbLectures = 10;    //Définit le nombre d'échantillons à conserver pour calculer la moyenne ; plus le chiffre est elevé, plus le tableau sera "lissé", mais plus le programme sera lent. Utiliser  une constante plutôt qu'une variable normale permet d'utiliser cette valeur pour déterminer la taille du tableau.
 
-int Tableau[NbLectures];      // the Tableau from the analog input
-int IndexTableau = 0;              // the index of the current reading
-int Total = 0;                  // the running Total
-int Moyenne = 0;                // the Moyenne
+int Tableau[NbLectures];      // Tableau recevant les signaux analogiques
+int IndexTableau = 0;         // l'index de position du tableau
+int Total = 0;
+int Moyenne = 0;
 
-int Anemometre = A0;
+int Anemometre = A0;          // Anémomètre sur le pin analogique A0
 
 void setup() {
-  // initialize serial communication with computer:
+  // initialisation de la communication avec le port série
   Serial.begin(9600);
-  // initialize all the Tableau to 0:
+  // initialisation de toutes les positions dans le tableau à 0
   for (int thisReading = 0; thisReading < NbLectures; thisReading++) {
     Tableau[thisReading] = 0;
   }
 }
 
 void loop() {
-  // subtract the last reading:
+  // soustraire à la position précédente
   Total = Total - Tableau[IndexTableau];
-  // read from the sensor:
+  // lecture du capteur
   Tableau[IndexTableau] = analogRead(Anemometre);
-  // add the reading to the Total:
+  // ajouter la lecture au tableau
   Total = Total + Tableau[IndexTableau];
-  // advance to the next position in the array:
+  // avancer à la position suivante dans le tableau
   IndexTableau = IndexTableau + 1;
 
-  // if we're at the end of the array...
+  // Si on est à la fin du tableau...
   if (IndexTableau >= NbLectures) {
-    // ...wrap around to the beginning:
+    // ...recommencer au début
     IndexTableau = 0;
   }
 
-  // calculate the Moyenne:
+  // Calcul de la moyenne:
   Moyenne = Total / NbLectures;
-  // send it to the computer as ASCII digits
+  // l'envoyer au port série en chiffres ASCII
   Serial.print("Capteur : ");
   Serial.println(analogRead(Anemometre));
   Serial.print("Moyenne : ");
   Serial.println(Moyenne);
-  delay(100);        // delay in between reads for stability
+  delay(100);        // délai entre les lectures
 }
 
