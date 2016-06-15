@@ -2,6 +2,17 @@
   La solution ici consiste à calculer une moyenne mobile sur un nombre d'échantillons précis. 
   Par exemple : les dix derniers échantillons pour une analyse sur 1 secondes
   (et donc les 30 derniers pour une analyse sur 3 secondes*/
+
+/*Variables pratiques*/
+int Sec=1000;
+
+/*Matériel*/
+int Anemometre = A0;          // Anemometre sur le pin analogique A0
+
+//Écran LED
+
+
+/*Variables destinées au calcul de la moyenne*/
 const int NbLectures = 30;    //Définit le nombre d'échantillons à conserver pour calculer la moyenne ; plus le chiffre est elevé, plus le tableau sera "lissé", mais plus le programme sera lent. Utiliser  une constante plutôt qu'une variable normale permet d'utiliser cette valeur pour déterminer la taille du tableau.
 
 int Tableau[NbLectures];      // Tableau recevant les signaux analogiques
@@ -9,7 +20,6 @@ int IndexTableau = 0;         // l'index de position du tableau
 int Total = 0;
 int Moyenne = 0;
 
-int Anemometre = A0;          // Anémomètre sur le pin analogique A0
 
 void setup() {
   // initialisation de la communication avec le port série
@@ -21,6 +31,11 @@ void setup() {
 }
 
 void loop() {
+  CalculMoyenne();
+
+}
+
+void CalculMoyenne(){
   // soustraire à la position précédente
   Total = Total - Tableau[IndexTableau];
   // lecture du capteur
@@ -44,5 +59,6 @@ void loop() {
   Serial.print("Moyenne : ");
   Serial.println(Moyenne);
   delay(100);        // délai entre les lectures
+  return(Moyenne);
 }
 
