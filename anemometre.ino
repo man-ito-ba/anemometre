@@ -7,31 +7,32 @@ const int NbLectures = 5;    //Définit le nombre d'échantillons à conserver p
 int Tableau[NbLectures];      // Tableau recevant les signaux analogiques
 int IndexTableau = 0;         // l'index de position du tableau
 float Moyenne;
+float ValeurMoyenne;
 float Total;
 
 //déclaration des constantes de broche 
   //Digit 1
-    int D1_A=8;
-    int D1_B=9;
-    int D1_C=10;
-    int D1_D=11;
-    int D1_E=12;
-    int D1_G=13;
+    int D1A=8;
+    int D1B=9;
+    int D1C=10;
+    int D1D=11;
+    int D1E=12;
+    int D1G=13;
   //Digit 2
-    int D2_A=7;
-    int D2_B=6;
-    int D2_C=5;
-    int D2_D=4;
-    int D2_E=3;
-    int D2_F=2;
-    int D2_G=1;
-    int D2_DP=0;
+    int D2A=7;
+    int D2B=6;
+    int D2C=5;
+    int D2D=4;
+    int D2E=3;
+    int D2F=2;
+    int D2G=1;
+    int D2Dp=0;
   //Digit 3
-    int D3_A=A1;
-    int D3_C=A2;
-    int D3_D=A3;
-    int D3_F=A4;
-    int D3_G=A5;
+    int D3A=A1;
+    int D3C=A2;
+    int D3D=A3;
+    int D3F=A4;
+    int D3G=A5;
 
 void setup() {
   //initialisation du Port série
@@ -39,40 +40,51 @@ void setup() {
   Serial.println("Start");
   //Initialisation du pin de bouton en entree
   pinMode(Anemometre, INPUT);
-  //Initialisation des pins de digit en sorties
-    pinMode(D1_A, OUTPUT);
-    pinMode(D1_B, OUTPUT);
-    pinMode(D1_C, OUTPUT);
-    pinMode(D1_D, OUTPUT);
-    pinMode(D1_E, OUTPUT);
+  //Initialisation des pins de digit en sorties et à 0V
+    pinMode(D1A, OUTPUT);
+    pinMode(D1B, OUTPUT);
+    pinMode(D1C, OUTPUT);
+    pinMode(D1D, OUTPUT);
+    pinMode(D1E, OUTPUT);
 
-    pinMode(D2_A, OUTPUT);
-    pinMode(D2_B, OUTPUT);
-    pinMode(D2_C, OUTPUT);
-    pinMode(D2_D, OUTPUT);
-    pinMode(D2_E, OUTPUT);
-    pinMode(D2_F, OUTPUT);
-    pinMode(D2_G, OUTPUT);
-    pinMode(D2_DP, OUTPUT);
+    pinMode(D2A, OUTPUT);
+    pinMode(D2B, OUTPUT);
+    pinMode(D2C, OUTPUT);
+    pinMode(D2D, OUTPUT);
+    pinMode(D2E, OUTPUT);
+    pinMode(D2F, OUTPUT);
+    pinMode(D2G, OUTPUT);
+    pinMode(D2Dp, OUTPUT);
 
-    pinMode(D3_A, OUTPUT);
-    pinMode(D3_C, OUTPUT);
-    pinMode(D3_D, OUTPUT);
-    pinMode(D3_F, OUTPUT);
-    pinMode(D3_G, OUTPUT);
+    pinMode(D3A, OUTPUT);
+    pinMode(D3C, OUTPUT);
+    pinMode(D3D, OUTPUT);
+    pinMode(D3F, OUTPUT);
+    pinMode(D3G, OUTPUT);
+
+    for(int i=0; i<14; i++){
+        digitalWrite(i, LOW);
+    }
+    digitalWrite(A1, LOW);
+    digitalWrite(A2, LOW);
+    digitalWrite(A3, LOW);
+    digitalWrite(A4, LOW);
+    digitalWrite(A5, LOW);
+    
   //Initialisation des variables à 0 pour éviter les comportements erratiques
-  Anemometre=0;
-  ValeurAnemometre=0;
-  Moyenne=0;
-  Total=0;
+    Anemometre=0;
+    ValeurAnemometre=0;
+    Moyenne=0;
+    ValeurMoyenne=0;
+    Total=0;
 }
 
 void loop() {
   CalculMoyenne();            //calcul de la moyenne
   Serial.println("Anemometre mapped :");
-  Serial.println(ValeurAnemometre);
-  Affichage(ValeurAnemometre);      //Affichage de la moyenne
-  delay(500);
+  Serial.println(ValeurMoyenne);
+  Affichage(ValeurMoyenne);      //Affichage de la moyenne
+  delayMicroseconds(10);
 }
 
 float CalculMoyenne(){
@@ -93,9 +105,9 @@ float CalculMoyenne(){
 
   // Calcul de la moyenne:
   Moyenne = Total / NbLectures;
-  ValeurAnemometre=map(Moyenne, 0, 1023, 0, 20);
+  ValeurMoyenne=map(Moyenne, 14, 1019, 0, 20);
   delay(100);   // délai entre les lectures
-  return(ValeurAnemometre);
+  return(ValeurMoyenne);
 }
 
 void Affichage(float Moyenne){
@@ -225,176 +237,178 @@ void Affichage(float Moyenne){
   }
 }
 
+// Éteindre les trois digit  ---------------------------------
+
+  void D123_0(){
+    digitalWrite(D1A,1);
+    digitalWrite(D1B,1);
+    digitalWrite(D1C,1);
+    digitalWrite(D1D,1);
+    digitalWrite(D1E,1);
+    digitalWrite(D1G,1);
+
+    digitalWrite(D2A,1);
+    digitalWrite(D2B,1);
+    digitalWrite(D2C,1);
+    digitalWrite(D2D,1);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,1);
+    digitalWrite(D2G,1);
+    digitalWrite(D2Dp,1);
+
+    digitalWrite(D3A,1);
+    digitalWrite(D3C,1);
+    digitalWrite(D3D,1);
+    digitalWrite(D3F,1);
+    digitalWrite(D3G,1);
+  }
+
 // Chiffres du digit 1 ---------------------------------------
 
-void D1_0(){
-  digitalWrite(D1_G,0);
-}
+  void D1_0(){
+    
+  }
 
-void D1_1(){
-  digitalWrite(D1_A,1),
-  digitalWrite(D1_B,0),
-  digitalWrite(D1_C,0),
-  digitalWrite(D1_D,1),
-  digitalWrite(D1_E,1),
-  digitalWrite(D1_G,1);
-}
+  void D1_1(){
+    digitalWrite(D1A,1);
+    digitalWrite(D1B,0);
+    digitalWrite(D1C,0);
+    digitalWrite(D1D,1);
+    digitalWrite(D1E,1);
+    digitalWrite(D1G,1);
+  }
 
-void D1_2(){
-  digitalWrite(D1_A,0),
-  digitalWrite(D1_B,0),
-  digitalWrite(D1_C,1),
-  digitalWrite(D1_D,0),
-  digitalWrite(D1_E,0),
-  digitalWrite(D1_G,0);
-}
+  void D1_2(){
+    digitalWrite(D1A,0);
+    digitalWrite(D1B,0);
+    digitalWrite(D1C,1);
+    digitalWrite(D1D,0);
+    digitalWrite(D1E,0);
+    digitalWrite(D1G,0);
+  }
 
 // Chiffres du digit 2 ---------------------------------------
 
-void D2_0(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,1),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,0),
-  digitalWrite(D2_DP,0);
-}
+  void D2_0(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,0);
+    digitalWrite(D2F,0);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_1(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,0),
-  digitalWrite(D2_C,0),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,1),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,0);
-}
+  void D2_1(){
+    digitalWrite(D2A,1);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,1);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,1);
+    digitalWrite(D2G,1);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_2(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,0),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,1),
-  digitalWrite(D2_F,0),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,0);
-}
+  void D2_2(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,1);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,0);
+    digitalWrite(D2F,1);
+    digitalWrite(D2G,1);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_3(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,0),
-  digitalWrite(D2_F,0),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1);
-}
-  
-void D2_4(){
-  digitalWrite(D2_A,0),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,0),
-  digitalWrite(D2_E,0),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1);
-}
+  void D2_3(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,1);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
+    
+  void D2_4(){
+    digitalWrite(D2A,1);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,1);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,0);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_5(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,0),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,0),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1);
-}
-  
-void D2_6(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,0),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,1),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1);
-}
+  void D2_5(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,1);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,0);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
+    
+  void D2_6(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,1);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,0);
+    digitalWrite(D2F,0);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_7(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,0),
-  digitalWrite(D2_E,0),
-  digitalWrite(D2_F,0),
-  digitalWrite(D2_G,0),
-  digitalWrite(D2_DP,1);
-}
+  void D2_7(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,1);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,1);
+    digitalWrite(D2G,1);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_8(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,1),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1);
-}
+  void D2_8(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,0);
+    digitalWrite(D2F,0);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
 
-void D2_9(){
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,0),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1);
-}
+  void D2_9(){
+    digitalWrite(D2A,0);
+    digitalWrite(D2B,0);
+    digitalWrite(D2C,0);
+    digitalWrite(D2D,0);
+    digitalWrite(D2E,1);
+    digitalWrite(D2F,0);
+    digitalWrite(D2G,0);
+    digitalWrite(D2Dp,0);
+  }
 
 // Chiffres du digit 3 ---------------------------------------
 
-void D3_0(){
-digitalWrite(D3_G,1);
-}
+  void D3_0(){
+  digitalWrite(D3G,1);
+  }
 
-void D3_5(){
-  digitalWrite(D3_A,0),
-  digitalWrite(D3_C,0),
-  digitalWrite(D3_D,0),
-  digitalWrite(D3_F,0),
-  digitalWrite(D3_G,0);
-}
-
-void D123_0(){
-  digitalWrite(D1_A,1),
-  digitalWrite(D1_B,1),
-  digitalWrite(D1_C,1),
-  digitalWrite(D1_D,1),
-  digitalWrite(D1_E,1),
-  digitalWrite(D1_G,1),
-
-  digitalWrite(D2_A,1),
-  digitalWrite(D2_B,1),
-  digitalWrite(D2_C,1),
-  digitalWrite(D2_D,1),
-  digitalWrite(D2_E,1),
-  digitalWrite(D2_F,1),
-  digitalWrite(D2_G,1),
-  digitalWrite(D2_DP,1),
-
-  digitalWrite(D3_A,1),
-  digitalWrite(D3_C,1),
-  digitalWrite(D3_D,1),
-  digitalWrite(D3_F,1),
-  digitalWrite(D3_G,1);
-}
+  void D3_5(){
+    digitalWrite(D3A,1);
+    digitalWrite(D3C,1);
+    digitalWrite(D3D,1);
+    digitalWrite(D3F,1);
+    digitalWrite(D3G,1);
+  }
