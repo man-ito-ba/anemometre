@@ -80,14 +80,16 @@ void setup() {
 }
 
 void loop() {
-  CalculMoyenne();            //calcul de la moyenne
+  ValeurAnemometre=analogRead(Anemometre);
+  CalculMoyenne(ValeurAnemometre);            //calcul de la moyenne
   Serial.println("Anemometre mapped :");
   Serial.println(ValeurMoyenne);
   Affichage(ValeurMoyenne);      //Affichage de la moyenne
   delayMicroseconds(10);
 }
 
-float CalculMoyenne(){
+float CalculMoyenne(float ValeurAnemometre){
+  /*Tableau glissant (running average)*/
   // soustraire à la position précédente
   Total = Total - Tableau[IndexTableau];
   // lecture du capteur
@@ -103,6 +105,7 @@ float CalculMoyenne(){
     IndexTableau = 0;
   }
 
+  /*Moyenne*/
   // Calcul de la moyenne:
   Moyenne = Total / NbLectures;
   ValeurMoyenne=map(Moyenne, 14, 1019, 0, 20);
