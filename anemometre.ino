@@ -1,116 +1,134 @@
-/*Anemometre 1.6
-	url du fichier 123D.circuits.io :
-	https://123d.circuits.io/circuits/2367833
-	*/
-/*Matériel*/
-int Anemometre = A0;			 //capteur
-int ValeurAnemometre;	 //variable de lecture du capteur
+// Déclarations
+   const int segmentPins[] = {4,7,8,6,5,3,2,9};
+   const int Afficheur = 3;                     // Afficheurs / transistors
+   const int Afficheur_transistor[Afficheur] = {11,12,13}; // contrôle des transistors qui permettent de passer d'un afficheur à un autre
 
-//Déclaration des deux afficheurs : dizaines & unitées
-int Dizaines[7] = {
-	11 ,	// a
-	10 ,	// b
-	 7 ,	// c
-	 8 ,	// d
-	 9 ,	// e
-	13 ,	// f
-	12	};	// g
-int Unitees [7] = {
-	 4 ,	// a
-	 3 ,	// b
-	 2 ,	// c
-	 0 ,	// d
-	 1 ,	// e
-	 6 ,	// f
-	 5 }; // g
+/* Matériel */
+/*----------*/
+
+// Boutons
+   int BoutonPlus = A0;
+   int BoutonMoins = A1;
+      bool previousUp = LOW;
+      bool currentUp = LOW;
+      bool previousDown = LOW;
+      bool currentDown = LOW;
+      int Decompte = 0;
+
+// Anémomètre
+   int Anemometre = A2;
+      int ValeurAnemometre;
+      int AnemometreCAN;
+
+/* Variables globales */
+/*--------------------*/
+
+// Variables destinées au calcul de la moyenne
+   const int NbLectures = 10;          //Définit le nombre d'échantillons à conserver pour calculer la moyenne ; plus le chiffre est elevé, plus le tableau sera "lissé", mais plus le programme sera lent. Utiliser une constante plutôt qu'une variable normale permet d'utiliser cette valeur pour déterminer la taille du tableau.
+   int Tableau[NbLectures];            // Tableau recevant les signaux analogiques
+   int IndexTableau = 0;               // l'index de position du tableau
+   int Moyenne, Total;
+
+// Tableau pour l'affichage des leds dans chaque afficheur 7 segments
+// bits représentant les segments A à G (et la virgule) for les chiffres 0 - 9
+   const int Chiffres[10] =
+    // ABCDEFGdp
+   {  B11111100 , // 0
+      B01100000 , // 1
+      B11011010 , // 2
+      B11110010 , // 3
+      B01100110 , // 4
+      B10110110 , // 5
+      B00111110 , // 6
+      B11100000 , // 7
+      B11111110 , // 8
+      B11100110 };  // 9
 /* Plan d'un afficheur
-	 --A--
-	 |	|
-	 F	 B
-	 |	|
-	 --G--
-	 |	|
-	 E	C
-	 |	|
-	 --D--
-	 */
+    --A--
+    |   |
+    F  B
+    |   |
+    --G--
+    |   |
+    E C
+    |   |
+    --D--
+    */
 
-/*Variables destinées au calcul de la moyenne*/
-const int NbLectures = 10;	//Définit le nombre d'échantillons à conserver pour calculer la moyenne ; plus le chiffre est elevé, plus le tableau sera "lissé", mais plus le programme sera lent. Utiliser une constante plutôt qu'une variable normale permet d'utiliser cette valeur pour déterminer la taille du tableau.
-int Tableau[NbLectures];	// Tableau recevant les signaux analogiques
-int IndexTableau = 0;	 // l'index de position du tableau
-int Moyenne, ValeurMoyenne, Total;
-
-// Tableau utilisé pour l'affichage des chiffres
-int Digits[10] = {
-	B00111111 , // 0
-	B00000110 , // 1
-	B01011011 , // 2
-	B01001111 , // 3
-	B01100110 , // 4
-	B01101101 , // 5
-	B01111101 , // 6
-	B00000111 , // 7
-	B01111111 , // 8
-	B01101111 };
 
 void setup() {
-	//initialisation du Port série
-		Serial.begin(9600);
-		Serial.println("Start");
-	pinMode(Anemometre, INPUT); // Initialisation du pin de bouton en entree
-	for(int i=0; i<=13; i++){	 // Initialisation des 13 pins utilisées pour les dizaines et les unitées, et mise à 0V (pour éviter les soucis)
-		 pinMode(i, OUTPUT);
-		 digitalWrite(i, LOW);
-	}
+   // Initialisation des broches digitales en sorties et mise à 0V
+   for(int i = 0; i < 8; i++){
+      pinMode(segmentPins[i], OUTPUT);
+      digitalWrite(i, LOW);
+   }
 
-	//Initialisation des variables à 0 pour éviter les comportements erratiques
-	ValeurAnemometre=0;
-	Moyenne=0;
-	ValeurMoyenne=0;
-	Total=0;
+   // Initialisation des broches digitales des transistors en sorties et mise à 0V
+   for(int i = 0; i < Afficheur; i++){
+      pinMode(Afficheur_transistor[i], OUTPUT);
+      digitalWrite(i, LOW);
+   }
+   
+   pinMode(BoutonMoins, INPUT); //button pin for Decompte down
+   pinMode(BoutonPlus, INPUT); //button pin for Decompte up
+   pinMode(Anemometre, INPUT);
+
+   // Mise à 0 des variables
+   ValeurAnemometre, AnemometreCAN, Moyenne, Total = 0;
 }
 
 void loop() {
-	ValeurAnemometre=analogRead(A0);		// lecture du capteur
-	CalculMoyenne(ValeurAnemometre);		// Calcul de la moyenne
-	AffichageDigits(1, Digits[Moyenne * 2 / 1023]);			 // C'est en changeant ce 2 qu'on permet à l'afficheur des dizaines d'indiquer le maximum à afficher (au lieu de passer par une fonction "map")
-	AffichageDigits(2, Digits[(Moyenne * 20 / 1023) % 10]); //C'Pareil mais avec les unités
-	delayMicroseconds(10);
+   CalculMoyenne(AnemometreCAN);
+   AffichageDuChiffre(AnemometreCAN);
 }
 
-int CalculMoyenne(int ValeurAnemometre){		/*Tableau glissant (running average)*/
+int CalculMoyenne(int ValeurAnemometre){     /*Tableau glissant (running average)*/
   // soustraire à la position précédente
-	Total = Total - Tableau[IndexTableau];
-	// lecture du capteur
-	Tableau[IndexTableau] = analogRead(Anemometre);
-	// ajouter la lecture au tableau
-	Total = Total + Tableau[IndexTableau];
-	// avancer à la position suivante dans le tableau (= "glisser")
-	IndexTableau = IndexTableau + 1;
+   Total = Total - Tableau[IndexTableau];
+   // lecture du capteur
+   Tableau[IndexTableau] = analogRead(Anemometre);
+   // ajouter la lecture au tableau
+   Total = Total + Tableau[IndexTableau];
+   // avancer à la position suivante dans le tableau (= "glisser")
+   IndexTableau = IndexTableau + 1;
 
-	// Si on est à la fin du tableau...
-	if (IndexTableau >= NbLectures) {
-	 // ...recommencer au début
-	 IndexTableau = 0;
-	}
+   // Si on est à la fin du tableau...
+   if (IndexTableau >= NbLectures) {
+    // ...recommencer au début
+    IndexTableau = 0;
+   }
 
-	// Calcul de la moyenne à partir des valeurs accumulées lors du glissement
-	Moyenne = Total / NbLectures;
-	delay(100);	// délai entre les lectures
-	return(Moyenne);
+   // Calcul de la moyenne à partir des valeurs accumulées lors du glissement
+   Moyenne = Total / NbLectures;
+   AnemometreCAN = map(Moyenne, 0, 1023, 0, 200);
+   delay(100); // délai entre les lectures
+   return(AnemometreCAN);
 }
 
-void AffichageDigits(int Segment, int Digit) {
-	int* Segment_Actuel = ((Segment == 1) ? Dizaines : Unitees); // choix du Segment (à l'aide d'un pointeur, identifié ici par "*")
-	for (int i = 0; i < 7; ++i) {
-		digitalWrite(Segment_Actuel[i], Digit & 1); // writes the least significant bit
-		Digit >>= 1;
-	}
+void AffichageDuChiffre(int Nombre){
+   if(Nombre == 0)
+      SegmentsUtilises(0, Afficheur - 1); // affiche 0 le plus à droite D0 D1 D2 D3("0")
+   else{
+      // Affiche la valeur correspondante à chaque digit
+      // l'afficheur le plus à gauche est 0
+      for(int digit = Afficheur - 1; digit >= 0; digit--){
+      if(Nombre > 0){
+         SegmentsUtilises(Nombre % 10, digit);
+         Nombre = Nombre/10;
+      }
+      }
+   }
 }
 
-void Extinction() {//une fonction pour éteindre l'ensemble des segments (on va jusqu'à 20 dans la boucle "for" car les pins analog ont été converties en sorties ; donc on a de 15 à 19 en plus pour contrôler les digits.)
-	for(int i=0; i<20; i++){
-		digitalWrite(i, 1);//éteint tout le reste
-	}
+// Affiche le nombre indiqué sur l'afficheur à 7 segments sur l'afficheur indiqué
+void SegmentsUtilises(int Nombre, int digit){
+   digitalWrite(Afficheur_transistor[digit], HIGH);
+   for(int Segment = 1; Segment < 8; Segment++){
+   bool isBitSet = bitRead(Chiffres[Nombre], Segment);
+   //isBitSet sera vrai si le bit donné est 1
+   //isBitSet = !isBitSet; //enlever le commentaire de cette ligne pour un afficheur avec une anode commune
+   digitalWrite(segmentPins[Segment], isBitSet);
+   }
+   delay(15);
+   digitalWrite(Afficheur_transistor[digit], LOW);
 }
