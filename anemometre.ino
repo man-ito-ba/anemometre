@@ -72,8 +72,8 @@ void setup() {
 		digitalWrite(i, LOW);
 	}
 	
-   pinMode(Led_tension, OUTPUT);
-   digitalWrite(Led_tension, LOW);
+	pinMode(Led_tension, OUTPUT);
+	digitalWrite(Led_tension, LOW);
 
 	pinMode(BoutonMoins, INPUT); //button pin for Decompte down
 	pinMode(BoutonPlus, INPUT); //button pin for Decompte up
@@ -102,7 +102,7 @@ int CalculMoyenne(int ValeurAnemometre){	 /*Tableau glissant (running average)*/
 	// Si on est à la fin du tableau...
 	if (IndexTableau >= NbLectures) {
 	// ...recommencer au début
-	IndexTableau = 0;
+		IndexTableau = 0;
 	}
 
 	// Calcul de la moyenne à partir des valeurs accumulées lors du glissement
@@ -119,10 +119,10 @@ void AffichageDuChiffre(int Nombre){
 		// Affiche la valeur correspondante à chaque digit
 		// l'afficheur le plus à gauche est 0
 		for(int digit = Afficheur - 1; digit >= 0; digit--){
-		if(Nombre > 0){
-			SegmentsUtilises(Nombre % 10, digit);
-			Nombre = Nombre/10;
-		}
+			if(Nombre > 0){
+				SegmentsUtilises(Nombre % 10, digit);
+				Nombre = Nombre/10;
+			}
 		}
 	}
 }
@@ -131,10 +131,10 @@ void AffichageDuChiffre(int Nombre){
 void SegmentsUtilises(int Nombre, int digit){
 	digitalWrite(Afficheur_transistor[digit], HIGH);
 	for(int Segment = 1; Segment < 8; Segment++){
-	bool isBitSet = bitRead(Chiffres[Nombre], Segment);
-	//isBitSet sera vrai si le bit donné est 1
-	//isBitSet = !isBitSet; //enlever le commentaire de cette ligne pour un afficheur avec une anode commune
-	digitalWrite(segmentPins[Segment], isBitSet);
+		bool isBitSet = bitRead(Chiffres[Nombre], Segment);
+		//isBitSet sera vrai si le bit donné est 1
+		//isBitSet = !isBitSet; //enlever le commentaire de cette ligne pour un afficheur avec une anode commune
+		digitalWrite(segmentPins[Segment], isBitSet);
 	}
 	delay(15);
 	digitalWrite(Afficheur_transistor[digit], LOW);
