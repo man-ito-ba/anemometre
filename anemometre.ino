@@ -1,3 +1,4 @@
+// https://circuits.io/circuits/2385926
 // Déclarations
 	const int segmentPins[] = {4,7,8,6,5,3,2,9};
 	const int Afficheur = 3;							// Afficheurs / transistors
@@ -20,23 +21,23 @@
 		int ValeurAnemometre;
 		int AnemometreCAN;
 
-// Led de mise en tension
-	int Led_tension = 10;
+// Led de virgule
+	int Virgule = 10;
 
 /* Variables globales */
 /*--------------------*/
 
 // Variables destinées au calcul de la moyenne
 	const int NbLectures = 10;			//Définit le nombre d'échantillons à conserver pour calculer la moyenne ; plus le chiffre est elevé, plus le tableau sera "lissé", mais plus le programme sera lent. Utiliser une constante plutôt qu'une variable normale permet d'utiliser cette valeur pour déterminer la taille du tableau.
-	int Tableau[NbLectures];				// Tableau recevant les signaux analogiques
-	int IndexTableau = 0;					// l'index de position du tableau
+	int Tableau[NbLectures];			// Tableau recevant les signaux analogiques
+	int IndexTableau = 0;				// l'index de position du tableau
 	int Moyenne, Total;
 
 // Tableau pour l'affichage des leds dans chaque afficheur 7 segments
 // bits représentant les segments A à G (et la virgule) for les chiffres 0 - 9
 	const int Chiffres[10] =
 	// ABCDEFGdp
-	{  B11111100 , // 0
+	 {  B11111100 , // 0
 		B01100000 , // 1
 		B11011010 , // 2
 		B11110010 , // 3
@@ -72,8 +73,8 @@ void setup() {
 		digitalWrite(i, LOW);
 	}
 	
-	pinMode(Led_tension, OUTPUT);
-	digitalWrite(Led_tension, LOW);
+	pinMode(Virgule, OUTPUT);
+	digitalWrite(Virgule, LOW);
 
 	pinMode(BoutonMoins, INPUT); //button pin for Decompte down
 	pinMode(BoutonPlus, INPUT); //button pin for Decompte up
@@ -84,7 +85,7 @@ void setup() {
 }
 
 void loop() {
-   digitalWrite(Led_tension, HIGH);
+   digitalWrite(Virgule, HIGH);
 	CalculMoyenne(AnemometreCAN);
 	AffichageDuChiffre(AnemometreCAN);
 }
