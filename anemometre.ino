@@ -1,4 +1,4 @@
-// https://circuits.io/circuits/2385926
+// https://circuits.io/circuits/2418345
 // Déclarations
 	const int segmentPins[] = {4,7,8,6,5,3,2,9};
 	const int Afficheur = 3;							// Afficheurs / transistors
