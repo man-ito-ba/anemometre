@@ -60,10 +60,6 @@ void setup() {
 
 	// Mise à 0 des variables
 	AnemometreCAN, Moyenne, Total = 0;
-	//initialisation du Port série
-	Serial.begin(9600);
-	Serial.println("***************");
-	Serial.println("Start");
 }
 
 // ****************************************************************************
@@ -75,7 +71,6 @@ void loop()
 	digitalWrite(Virgule, HIGH);					// la virgule est allumée ainsi car je ne sais pas le faire autrement. C'est pas beau mais ça fonctionne :D 
 	Moyenne_Glissante();							// Le calcul de la moyenne renvoie "Moyenne"
 	AnemometreCAN = map(Moyenne, 0, 1023, 0, 200);	// On mappe "Moyenne" dans cette variable ""
-	Serial.println(Moyenne);
 	Affichage(AnemometreCAN);
 	delay(10);
 }
